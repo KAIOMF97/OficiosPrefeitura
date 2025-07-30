@@ -87,6 +87,8 @@
         alert("Senha incorreta. Ação bloqueada.");
         return;
       }
+
+      const novoNumero = prompt("Novo número (ou deixe em branco para manter):");
       const novaData = prompt("Nova data (AAAA-MM-DD):");
       const novoAssunto = prompt("Novo assunto (máx. 50 caracteres):");
 
@@ -94,10 +96,15 @@
 
       const formData = new FormData();
       formData.append("numero", numero);
+      formData.append("novoNumero", novoNumero);
       formData.append("data", novaData);
       formData.append("assunto", novoAssunto);
 
-      await fetch("editar.php", { method: "POST", body: formData });
+      await fetch("editar.php", {
+        method: "POST",
+        body: formData
+      });
+
       carregarOficios();
     }
 
