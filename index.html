@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Ofícios Expedidos</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>OFÍCIOS EXPEDIDOS 2025</h1>
+
+    <form id="form-oficio" method="POST">
+      <input type="date" id="data" required min="2025-01-01" max="2025-12-31">
+      <input type="text" id="assunto" placeholder="Assunto (máx. 50 caracteres)" maxlength="50" required>
+      <button type="submit">Adicionar Ofício</button>
+    </form>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Número</th>
+          <th>Data</th>
+          <th>Assunto</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody id="tabela-oficios"></tbody>
+    </table>
+  </div>
+
+  <script>
+    const SENHA = "C1ON4V";
+
+    async function carregarOficios() {
+      const resposta = await fetch('ler.php');
+      const dados = await resposta.json();
+      const tabela = document.getElementById("tabela-oficios");
+      tabela.innerHTML = '';
+      dados.forEach(oficio => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${oficio.numero}</td>
+          <td>${oficio.data}</td>
+          <td class="quebra">${oficio.assunto}</td>
+          <td>
+            <button onclick="editarOficio(${oficio.numero})">✏️</button>
+            <button onclick="excluirOficio(${oficio.numero})">🗑️</button>
+          </td>
+        `;
+        tabela.appendChild(tr);
+      });
+    }
+
+    document.getElementById("form-oficio").addEventListener("submit", async function (e) {
+      e.preventDefault();
+      const data = document.getElementById("data").value;
+      const assunto = document.getElementById("assunto").value;
+
+      const formData = new FormData();
+      formData.append("data", data);
+      formData.append("assunto", assunto);
+
+      await fetch("salvar.php", {
+        method: "POST",
+        body: formData
+      });
+
+      document.getElementById("form-oficio").reset();
+      carregarOficios();
+    });
+
+    async function excluirOficio(numero) {
+      const senha = prompt("Digite a senha para excluir:");
+      if (senha !== SENHA) {
+        alert("Senha incorreta. Ação bloqueada.");
+        return;
+      }
+      const confirmacao = confirm("Tem certeza que deseja excluir este ofício?");
+      if (!confirmacao) return;
+      await fetch(`excluir.php?numero=${numero}`, { method: "DELETE" });
+      carregarOficios();
+    }
+
+    async function editarOficio(numero) {
+      const senha = prompt("Digite a senha para editar:");
+      if (senha !== SENHA) {
+        alert("Senha incorreta. Ação bloqueada.");
+        return;
+      }
+      const novaData = prompt("Nova data (AAAA-MM-DD):");
+      const novoAssunto = prompt("Novo assunto (máx. 50 caracteres):");
+
+      if (!novaData || !novoAssunto || novoAssunto.length > 50) return;
+
+      const formData = new FormData();
+      formData.append("numero", numero);
+      formData.append("data", novaData);
+      formData.append("assunto", novoAssunto);
+
+      await fetch("editar.php", { method: "POST", body: formData });
+      carregarOficios();
+    }
+
+    carregarOficios();
+  </script>
+</body>
+</html>
