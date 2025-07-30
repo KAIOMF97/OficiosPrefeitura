@@ -8,7 +8,7 @@ $data = $_POST["data"];
 $assunto = $_POST["assunto"];
 
 $linhas = file("oficios.csv", FILE_IGNORE_NEW_LINES);
-$maiorNumero = 264; // Começa em 264, o próximo será 265
+$maiorNumero = 0;
 
 foreach ($linhas as $linha) {
   $partes = explode(",", $linha);
