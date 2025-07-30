@@ -7,7 +7,14 @@ if (!isset($_POST["data"], $_POST["assunto"])) {
 $data = $_POST["data"];
 $assunto = $_POST["assunto"];
 
-$linhas = file("oficios.csv", FILE_IGNORE_NEW_LINES);
+$arquivo = "oficios.csv";
+
+// Garante que o arquivo exista
+if (!file_exists($arquivo)) {
+  file_put_contents($arquivo, "");
+}
+
+$linhas = file($arquivo, FILE_IGNORE_NEW_LINES);
 $maiorNumero = 0;
 
 foreach ($linhas as $linha) {
@@ -18,6 +25,11 @@ foreach ($linhas as $linha) {
 }
 
 $novoNumero = $maiorNumero + 1;
-$novaLinha = "$novoNumero,$data,$assunto" . PHP_EOL;
-file_put_contents("oficios.csv", $novaLinha, FILE_APPEND);
+$novaLinha = "$novoNumero,$data,$assunto";
+
+// Adiciona quebra de linha apenas se o arquivo não estiver vazio e não terminar com \n
+$conteudoAtual = file_get_contents($arquivo);
+$separador = (strlen($conteudoAtual) > 0 && substr($conteudoAtual, -1) !== "\n") ? PHP_EOL : "";
+
+file_put_contents($arquivo, $separador . $novaLinha . PHP_EOL, FILE_APPEND);
 ?>
