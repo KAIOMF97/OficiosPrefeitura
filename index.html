@@ -81,32 +81,35 @@
       carregarOficios();
     }
 
-    async function editarOficio(numero) {
-      const senha = prompt("Digite a senha para editar:");
-      if (senha !== SENHA) {
-        alert("Senha incorreta. Ação bloqueada.");
-        return;
-      }
+    aasync function editarOficio(numero) {
+  const senha = prompt("Digite a senha para editar:");
+  if (senha !== SENHA) {
+    alert("Senha incorreta. Ação bloqueada.");
+    return;
+  }
 
-      const novoNumero = prompt("Novo número (ou deixe em branco para manter):");
-      const novaData = prompt("Nova data (AAAA-MM-DD):");
-      const novoAssunto = prompt("Novo assunto (máx. 50 caracteres):");
+  const novoNumero = prompt("Novo número (ou deixe em branco para manter):");
+  if (novoNumero === null) return;
 
-      if (!novaData || !novoAssunto || novoAssunto.length > 50) return;
+  const novaData = prompt("Nova data (AAAA-MM-DD):");
+  if (!novaData) return;
 
-      const formData = new FormData();
-      formData.append("numero", numero);
-      formData.append("novoNumero", novoNumero);
-      formData.append("data", novaData);
-      formData.append("assunto", novoAssunto);
+  const novoAssunto = prompt("Novo assunto (máx. 50 caracteres):");
+  if (!novoAssunto || novoAssunto.length > 50) return;
 
-      await fetch("editar.php", {
-        method: "POST",
-        body: formData
-      });
+  const formData = new FormData();
+  formData.append("numero", numero);
+  formData.append("novoNumero", novoNumero);
+  formData.append("data", novaData);
+  formData.append("assunto", novoAssunto);
 
-      carregarOficios();
-    }
+  await fetch("editar.php", {
+    method: "POST",
+    body: formData
+  });
+
+  carregarOficios();
+}
 
     carregarOficios();
   </script>
